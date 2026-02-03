@@ -1,8 +1,47 @@
+const passport = require("passport");
 const base64url = require("../../helper");
 const userEntity = require("../../model/user.model");
 const crypto = require("crypto");
 const jwtSecret =
   "shYnTMnSsbRecWsZx/pcjWMtlAx1RkZD3muD1n68BT71prXoWPblE85ass7GTIpNTkDNPz3osyT9NN9gOSyQl5W+Tj24JeLJD9ox60JDivz4UjSuciDhOS7ffeSzl2Gs8oq8UtrvSB7nfApSGExk1LsqkwCubjH51Dl0BtVZitk4zbdXevD6nq7JPppJY4PEWZAnyOwQT5tAVlBWptGGmGBadkQZ7AsU9wvo80kGYdTmA6aK3nOU2jaM+cS/pKGwJDA9ZWFE6fUk3oaLFF6jui/+0o7iVzK7ehN4d+UTE4u05XdCaulQZt9MsZjbeipnF+qeFdQh6EB5Wgbx+PN1fA==";
+
+//Hàm chuyển hướng đến trang đăng nhập google
+exports.getLoginGoogle = passport.authenticate("google", {
+  scope: ["profile", "email"], //Lấy giá trị profile và email
+  prompt: "select_account", //Mỗi lần chuyển đến trang đăng nhập google, người dùng có thể chọn tài khoản khác
+});
+//Hàm xử lý kết quả đăng nhập google
+exports.getResultLoginGoogle = [
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  async (req, res) => {
+    const user = req.user;
+    const header = {
+      alg: "HS256",
+      typ: "JWT",
+    };
+    const payload = {
+      sub: user._id,
+      exp: Date.now() + 3600000, //Token hạn 1 tiếng
+    };
+    //Mã hóa header
+    const encodedHeader = base64url(JSON.stringify(header));
+    //Mã hóa payload
+    const encodedPayload = base64url(JSON.stringify(payload));
+    //Tạo Token data với header và payload đã mã hóa
+    const tokenData = `${encodedHeader}.${encodedPayload}`;
+    //Tạo signature
+    const hmac = crypto.createHmac("sha256", jwtSecret);
+    const signature = hmac.update(tokenData).digest("base64url");
+    res.redirect(
+      `https://tech-shop-client.netlify.app?token=${
+        tokenData + "." + signature
+      }`
+    ); //Đăng nhập google thành công thì tạo jwt token và chuyển hướng về trang chủ đính kèm token vừa tạo
+  },
+];
 exports.postLogin = async (req, res) => {
   try {
     const { input, password } = req.body;

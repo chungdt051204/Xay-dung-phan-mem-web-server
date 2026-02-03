@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
       trim: true,
     },
 
@@ -24,12 +23,10 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: true,
     },
 
     phone: {
       type: String,
-      required: true,
       unique: true,
       trim: true,
     },
@@ -48,13 +45,27 @@ const userSchema = new mongoose.Schema(
 
     dateOfBirth: {
       type: Date,
-      default: Date.now,
+    },
+
+    avatar: {
+      type: String,
     },
 
     status: {
       type: String,
       enum: ["active", "inactive"],
       default: "active",
+    },
+
+    loginMethod: {
+      type: String,
+      enum: ["Email thường", "Google", "Facebook"],
+      default: "Email thường",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
 
     refreshToken: String,

@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://chungdo051204_db_user:0933898120a@cluster0.cczme0l.mongodb.net/nhom4?appName=Cluster0"
-    );
+    await mongoose.connect(process.env.DATABASE_URI);
     console.log("Kết nối thành công");
   } catch (error) {
     console.log("Kết nối thất bại", { error: error.message });
