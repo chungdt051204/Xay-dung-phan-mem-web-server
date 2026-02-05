@@ -8,6 +8,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "mongoose": "^9.1.6",
     "mongoose-paginate-v2": "^1.9.1",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
