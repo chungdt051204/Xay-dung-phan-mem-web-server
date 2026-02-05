@@ -10,12 +10,13 @@ const cors = require("cors");
 connectDB();
 app.use(
   cors({
-    origin: "https://tech-shop-client.netlify.app",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 const userRouter = require("./modules/user/user.router");
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu từ Form
 app.use("/", userRouter);
 //Xử lý đăng nhập google
 passport.use(
