@@ -39,7 +39,7 @@ exports.getResultLoginGoogle = [
     const hmac = crypto.createHmac("sha256", jwtSecret);
     const signature = hmac.update(tokenData).digest("base64url");
     res.redirect(
-      `https://tech-shop-client.netlify.app?token=${
+      `https://nhom4-chieu-thu-2.netlify.app?token=${
         tokenData + "." + signature
       }`
     ); //Đăng nhập google thành công thì tạo jwt token và chuyển hướng về trang chủ đính kèm token vừa tạo

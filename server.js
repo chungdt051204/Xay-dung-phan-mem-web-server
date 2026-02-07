@@ -10,7 +10,7 @@ const cors = require("cors");
 connectDB();
 app.use(
   cors({
-    origin: "https://tech-shop-client.netlify.app",
+    origin: "https://nhom4-chieu-thu-2.netlify.app",
     credentials: true,
   })
 );
