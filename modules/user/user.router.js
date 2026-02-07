@@ -8,8 +8,9 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    allowedFormat: ["jpg", "png", "jpeg"],
-    transformation: [{ width: 300, height: 400 }],
+    folder: "User",
+    allowedFormats: ["jpg", "png", "jpeg"],
+    transformation: [{ width: 300, height: 400, crop: "limit" }],
   },
 });
 const upload = multer({
@@ -25,7 +26,8 @@ router.get(
   `${prefix}/auth/google/callback`,
   userController.getResultLoginGoogle
 );
-
 router.post(`${prefix}/login`, userController.postLogin);
+router.post(`${prefix}/reset`, userController.postReset);
+router.post(`${prefix}/confirm`, userController.postConfirm);
 router.get(`${prefix}/me`, userController.getMe);
 module.exports = router;
