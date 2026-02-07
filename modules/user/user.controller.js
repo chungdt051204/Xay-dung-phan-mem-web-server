@@ -151,9 +151,7 @@ exports.postRegister = async (req, res) => {
     const code = Math.floor(100000 + Math.random() * 900000);
     newUser.resetCode = code;
     newUser.resetCodeExpiration = Date.now() + 5 * 60 * 1000;
-    await newUser.save();
-    await sendEmail(newUser.email, code, "Mã xác nhận đăng ký tài khoản");
-
+    sendEmail(newUser.email, code, "Mã xác nhận đăng ký tài khoản");
     return res.status(201).json({
       message: "Đăng ký thành công",
     });
