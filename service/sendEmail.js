@@ -2,16 +2,21 @@ const nodemailer = require("nodemailer");
 
 const sendEmail = async (to, code, subject) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: "apikey",
+      pass: process.env.SMTP_KEY,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 
   try {
     const info = await transporter.sendMail({
-      from: "Nhom4.com     <huy91856@gmail.com>",
+      from: "ChungDo <huy91856@gmail.com>",
       to: to,
       subject: subject,
       text: "Confirm Code: " + code,
