@@ -1,14 +1,13 @@
+require("dotenv").config();
 const nodemailer = require("nodemailer");
-
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   auth: {
-    user: "apikey",
+    user: process.env.EMAIL,
     pass: process.env.SMTP_KEY,
   },
-  connectionTimeout: 10000,
 });
 
 const sendEmail = (to, code, subject) => {

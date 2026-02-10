@@ -48,9 +48,12 @@ exports.getResultLoginGoogle = [
 exports.postLogin = async (req, res) => {
   try {
     const { input, password } = req.body;
-    console.log(btoa(password));
+    console.log(req.body);
     const user = await userEntity.findOne({
-      $or: [{ email: input }, { username: input }],
+      $and: [
+        { $or: [{ email: input }, { username: input }] },
+        { loginMethod: "Email thường" },
+      ],
     });
     if (!user || (await bcrypt.compare(password, user.password)) === false)
       return res
