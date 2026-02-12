@@ -16,9 +16,11 @@ app.use(
   })
 );
 const userRouter = require("./modules/user/user.router");
+const productRouter = require("./modules/product/product.router");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu từ Form
 app.use("/", userRouter);
+app.use("/", productRouter);
 //Xử lý đăng nhập google
 passport.use(
   new GoogleStrategy(
