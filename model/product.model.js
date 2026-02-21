@@ -48,8 +48,8 @@ const productSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["còn hàng", "hết hàng"],
-      default: "còn hàng",
+      enum: ["còn bán", "ngừng bán"],
+      default: "còn bán",
     },
 
     brandId: {
@@ -64,11 +64,9 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    colorId: [
+    colors: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "colorEntity",
-        required: true,
+        type : String
       },
     ],
   },

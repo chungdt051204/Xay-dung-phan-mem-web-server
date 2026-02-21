@@ -30,4 +30,6 @@ router.post(`${prefix}/login`, userController.postLogin);
 router.post(`${prefix}/reset`, userController.postReset);
 router.post(`${prefix}/confirm`, userController.postConfirm);
 router.get(`${prefix}/me`, userController.getMe);
+router.get(`${prefix}/user`, userController.getUser);
+router.put(`${prefix}/admin/user`, userController.putStatus);
 module.exports = router;

@@ -1,3 +1,4 @@
+const mongoosePaginate = require("mongoose-paginate-v2");
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
   {
@@ -78,5 +79,5 @@ const userSchema = new mongoose.Schema(
     timestamps: true, //Tự động tạo createdAt và UpdatedAt
   }
 );
-
+userSchema.plugin(mongoosePaginate);
 module.exports = mongoose.model("userEntity", userSchema, "user");

@@ -59,6 +59,10 @@ exports.postLogin = async (req, res) => {
       return res
         .status(401)
         .json({ message: "Thông tin đăng nhập không hợp lệ" });
+    if (user.status === "inactive")
+      return res
+        .status(401)
+        .json({ message: "Tài khoản này đã bị vô hiệu hóa" });
     if (!user.isVerified)
       return res
         .status(401)
@@ -246,5 +250,45 @@ exports.getMe = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Lấy thông tin người dùng thất bại" });
+  }
+};
+exports.getUser = async (req, res) => {
+  try {
+    const arrayUser = await userEntity.find();
+    const { _page = 1, _limit = arrayUser?.length, role, id } = req.query;
+    let query = {};
+    if (id) {
+      const user = await userEntity.findOne({ _id: id });
+      return res.status(200).json({ result: user });
+    }
+    if (role) query.roles = role;
+    const options = {
+      page: _page,
+      limit: _limit,
+    };
+    const users = await userEntity.paginate(query, options);
+    return res.status(200).json({ result: users });
+  } catch (error) {
+    console.log("Có lỗi xảy ra khi xử lý hàm getUser");
+    return res.status(500).json({ message: "Lấy dũ liệu người dùng thất bại" });
+  }
+};
+exports.putStatus = async (req, res) => {
+  try {
+    const { id } = req.query;
+    const { status } = req.body;
+    const result = await userEntity.updateOne({ _id: id }, { status });
+    if (result.modifiedCount === 0)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy người dùng để thay đổi trạng thái" });
+    return res
+      .status(200)
+      .json({ message: "Thay đổi trạng thái người dùng thành công" });
+  } catch (error) {
+    console.log("Có lỗi xảy ra khi xử lý hàm putStatus");
+    return res
+      .status(500)
+      .json({ message: "Thay đổi trạng thái người dùng thất bại" });
   }
 };
