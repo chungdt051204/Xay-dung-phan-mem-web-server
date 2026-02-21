@@ -47,7 +47,7 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await productEntity.findOne({ category: id });
+    const product = await productEntity.findOne({ categoryId: id });
     if (product) {
       return res
         .status(400)
