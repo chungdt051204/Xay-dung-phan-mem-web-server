@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const orderSchema = new mongoose.Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "userEntity",
       required: true,
     },
@@ -62,5 +63,7 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("orderEntity", orderSchema, "order");

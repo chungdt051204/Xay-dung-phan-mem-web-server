@@ -21,6 +21,8 @@ exports.getResultLoginGoogle = [
   }),
   async (req, res) => {
     const user = req.user;
+    if (user.status === "inactive")
+      return res.redirect("http://localhost:5173/access-denied");
     const header = {
       alg: "HS256",
       typ: "JWT",
