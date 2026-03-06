@@ -1,6 +1,40 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
+const orderItemsSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "productEntity",
+      required: true,
+    },
 
+    // productName: {
+    //   type: String,
+    //   required: true,
+    // },
+
+    quantity: {
+      type: Number,
+      min: 1,
+      required: true,
+    },
+
+    price: {
+      type: Number,
+      min: 0,
+      required: true,
+    },
+
+    amount: {
+      type: Number,
+      min: 0,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 const orderSchema = new mongoose.Schema(
   {
     userId: {
@@ -22,7 +56,6 @@ const orderSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
 
@@ -34,7 +67,7 @@ const orderSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ["MoMo", "COD", "ZaloPay", "Cash"],
+      enum: ["cod", "online"],
       required: true,
     },
 
@@ -60,10 +93,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    items: [orderItemsSchema],
   },
   { timestamps: true }
 );
 
 orderSchema.plugin(mongoosePaginate);
-
 module.exports = mongoose.model("orderEntity", orderSchema, "order");

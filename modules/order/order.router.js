@@ -5,7 +5,7 @@ const orderController = require("./order.controller");
 // Order routes
 router.get("/order", orderController.getOrder);
 router.get("/order/id", orderController.getOrderById);
-router.post("/order", orderController.createOrder);
+router.post("/order", orderController.postOrder);
 router.put("/order", orderController.updateOrderStatus);
 router.delete("/order", orderController.deleteOrder);
 
