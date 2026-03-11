@@ -3,12 +3,18 @@ const productEntity = require("../../model/product.model");
 
 exports.getBrands = async (req, res) => {
   try {
-    const { id } = req.query;
+    const arrayBrand = await brandEntity.find();
+    const { _page = 1, _limit = arrayBrand?.length, id } = req.query;
+    const options = {
+      page: _page,
+      limit: _limit,
+    };
+    let query = {};
     if (id) {
       const brand = await brandEntity.findOne({ _id: id });
       return res.status(200).json({ result: brand });
     }
-    const brands = await brandEntity.find();
+    const brands = await brandEntity.paginate(query, options);
     res.status(200).json({ result: brands });
   } catch (error) {
     console.log("Lỗi ở hàm getProduct:", error);

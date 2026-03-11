@@ -3,6 +3,7 @@ const router = express.Router();
 const usersController = require("./users.controller");
 const prefix = "";
 router.get(`${prefix}/users`, usersController.getUser);
+router.get(`${prefix}/users/:id`, usersController.getUserWithId);
 router.post(`${prefix}/users`, usersController.postUser);
 router.delete(`${prefix}/users`, usersController.deleteUser);
 router.put(`${prefix}/users`, usersController.putUser);
