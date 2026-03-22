@@ -43,13 +43,16 @@ exports.postCart = async (req, res) => {
 };
 exports.getCart = async (req, res) => {
   try {
-    const { userId } = req.query;
-    if (userId) {
+    const payload = req.payload;
+    if (payload) {
       const myCart = await cartEntity
-        .findOne({ userId })
+        .findOne({ userId: payload.sub })
         .populate("items.productId");
       return res.status(200).json({ result: myCart });
     }
+    return res
+      .status(404)
+      .json({ message: "Không tìm thấy giỏ hàng của người dùng" });
   } catch (error) {
     console.log({
       message: "Có lỗi xảy ra khi xử lý hàm getCart",
@@ -83,7 +86,12 @@ exports.putQuantity = async (req, res) => {
 };
 exports.deleteItem = async (req, res) => {
   try {
-    const { userId, itemId } = req.query;
+    const payload = req.payload;
+    if (!payload)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy giỏ hàng để xóa sản phẩm" });
+    const { itemId } = req.query;
     const { itemIds } = req.body || [];
     let option = "";
     let message = "";
@@ -95,7 +103,10 @@ exports.deleteItem = async (req, res) => {
       option = { items: { _id: { $in: itemIds } } };
       message = "Đã xóa các sản phẩm được chọn ra khỏi giỏ hàng thành công";
     }
-    const result = await cartEntity.updateOne({ userId }, { $pull: option });
+    const result = await cartEntity.updateOne(
+      { userId: payload.sub },
+      { $pull: option }
+    );
     if (result.modifiedCount === 0)
       return res
         .status(404)

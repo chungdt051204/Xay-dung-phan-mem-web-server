@@ -1,4 +1,3 @@
-require("dns").setDefaultResultOrder("ipv4first");
 const connectDB = require("./config/connectDB");
 const userEntity = require("./model/user.model");
 require("dotenv").config();
@@ -8,6 +7,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const cors = require("cors");
+
 connectDB();
 app.use(
   cors({
@@ -22,6 +22,7 @@ const brandRouter = require("./modules/brand/brand.router");
 const categoryRouter = require("./modules/category/category.router");
 const cartRouter = require("./modules/cart/cart.router");
 const orderRouter = require("./modules/order/order.router");
+const chatbotRouter = require("./modules/chatbot/chatbot.router");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu từ Form
@@ -32,7 +33,10 @@ app.use("/", brandRouter);
 app.use("/", categoryRouter);
 app.use("/", cartRouter);
 app.use("/", orderRouter);
-
+app.use("/", chatbotRouter);
+app.get("/", (req, res) => {
+  return res.json({ message: "API xem danh sách người dùng: /users" });
+});
 //Xử lý đăng nhập google
 passport.use(
   new GoogleStrategy(

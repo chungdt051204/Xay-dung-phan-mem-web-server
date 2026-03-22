@@ -230,28 +230,41 @@ exports.postConfirm = async (req, res) => {
 };
 exports.getMe = async (req, res) => {
   try {
-    const token = req.headers.authorization.slice(7);
-    if (!token) return res.status(401).json({ message: "Unauthorized" });
-    const [encodedHeader, encodedPayload, tokenSignature] = token.split(".");
-    //Tạo lại signature và so sánh với signature cũ
-    const tokenData = `${encodedHeader}.${encodedPayload}`;
-    //Tạo signature
-    const hmac = crypto.createHmac("sha256", jwtSecret);
-    const signature = hmac.update(tokenData).digest("base64url");
-    if (signature === tokenSignature) {
-      const payload = JSON.parse(atob(encodedPayload));
-      if (payload.exp < Date.now())
-        return res.status(401).json("Token đã hết hạn");
-      const user = await userEntity.findOne({ _id: payload.sub });
-      if (!user)
-        return res.status(404).json({ message: "Không tìm thấy người dùng" });
-      return res.status(200).json({ data: user });
-    }
+    const { sub } = req.payload;
+    const me = await userEntity.findOne({ _id: sub });
+    if (!me)
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    return res.status(200).json({ result: me });
   } catch (error) {
     console.log("Có lỗi xảy ra khi xử lý hàm getMe");
     return res
       .status(500)
       .json({ message: "Lấy thông tin người dùng thất bại" });
+  }
+};
+exports.putMe = async (req, res) => {
+  try {
+    const { sub } = req.payload;
+    const user = await userEntity.findOne({ _id: sub });
+    if (!user)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy người dùng để cập nhật thông tin" });
+    const fullname = req.body.fullname || user.fullname;
+    const gender = req.body.gender || user.gender;
+    const avatar = req?.file?.path || user.avatar;
+    await userEntity.updateOne(
+      { _id: sub },
+      { fullname, gender, avatar: avatar }
+    );
+    return res
+      .status(200)
+      .json({ message: "Cập nhật thông tin người dùng thành công" });
+  } catch (error) {
+    console.log("Có lỗi xảy ra khi xử lý hàm putMe");
+    return res
+      .status(500)
+      .json({ message: "Cập nhật thông tin người dùng thất bại" });
   }
 };
 exports.getUser = async (req, res) => {

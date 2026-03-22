@@ -25,8 +25,8 @@ exports.getBrands = async (req, res) => {
 exports.deleteBrand = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await productEntity.findOne({ brand: id });
-    if (product) {
+    const product = await productEntity.find({ brandId: id });
+    if (product.length > 0) {
       return res.status(400).json({
         message: "Không thể xóa thương hiệu vì có sản phẩm liên quan.",
       });
@@ -42,6 +42,9 @@ exports.deleteBrand = async (req, res) => {
 exports.createBrand = async (req, res) => {
   try {
     const { brandName } = req.body;
+    const brand = await brandEntity.findOne({ brandName });
+    if (brand)
+      return res.status(409).json({ message: "Đã có thương hiệu này rồi !!!" });
     await brandEntity.create({ brandName });
     res.status(201).json({ message: "Tạo thương hiệu thành công" });
   } catch (error) {
@@ -53,6 +56,9 @@ exports.createBrand = async (req, res) => {
 exports.updateBrand = async (req, res) => {
   try {
     const { id, brandName } = req.body;
+    const brand = await brandEntity.findOne({ brandName });
+    if (brand)
+      return res.status(409).json({ message: "Đã có thương hiệu này rồi !!!" });
     await brandEntity.findByIdAndUpdate(id, { brandName });
     res.status(200).json({
       message: "Cập nhật thương hiệu thành công",

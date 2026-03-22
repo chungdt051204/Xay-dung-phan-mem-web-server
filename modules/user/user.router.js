@@ -5,6 +5,10 @@ const prefix = "";
 const multer = require("multer");
 const cloudinary = require("../../config/cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const {
+  verifyToken,
+  verifyAdmin,
+} = require("../../service/middleware/authMiddleware");
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -29,7 +33,18 @@ router.get(
 router.post(`${prefix}/login`, userController.postLogin);
 router.post(`${prefix}/reset`, userController.postReset);
 router.post(`${prefix}/confirm`, userController.postConfirm);
-router.get(`${prefix}/me`, userController.getMe);
+router.get(`${prefix}/me`, verifyToken, userController.getMe);
+router.put(
+  `${prefix}/me`,
+  verifyToken,
+  upload.single("avatar"),
+  userController.putMe
+);
 router.get(`${prefix}/user`, userController.getUser);
-router.put(`${prefix}/admin/user`, userController.putStatus);
+router.put(
+  `${prefix}/admin/user`,
+  verifyToken,
+  verifyAdmin,
+  userController.putStatus
+);
 module.exports = router;
