@@ -22,7 +22,7 @@ exports.getResultLoginGoogle = [
   async (req, res) => {
     const user = req.user;
     if (user.status === "inactive")
-      return res.redirect("http://localhost:5173/access-denied");
+      return res.redirect(`${process.env.URL_FRONTEND}/access-denied`);
     const header = {
       alg: "HS256",
       typ: "JWT",
@@ -41,9 +41,7 @@ exports.getResultLoginGoogle = [
     const hmac = crypto.createHmac("sha256", jwtSecret);
     const signature = hmac.update(tokenData).digest("base64url");
     res.redirect(
-      `https://nhom4-chieu-thu-2.netlify.app?token=${
-        tokenData + "." + signature
-      }`
+      `${process.env.URL_FRONTEND}?token=${tokenData + "." + signature}`
     ); //Đăng nhập google thành công thì tạo jwt token và chuyển hướng về trang chủ đính kèm token vừa tạo
   },
 ];

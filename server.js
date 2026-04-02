@@ -11,7 +11,7 @@ const cors = require("cors");
 connectDB();
 app.use(
   cors({
-    origin: "https://nhom4-chieu-thu-2.netlify.app",
+    origin: process.env.URL_FRONTEND,
     credentials: true,
   })
 );
@@ -23,6 +23,7 @@ const categoryRouter = require("./modules/category/category.router");
 const cartRouter = require("./modules/cart/cart.router");
 const orderRouter = require("./modules/order/order.router");
 const chatbotRouter = require("./modules/chatbot/chatbot.router");
+const revenueRouter = require("./modules/revenue/revenue.router");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu từ Form
@@ -34,9 +35,7 @@ app.use("/", categoryRouter);
 app.use("/", cartRouter);
 app.use("/", orderRouter);
 app.use("/", chatbotRouter);
-app.get("/", (req, res) => {
-  return res.json({ message: "API xem danh sách người dùng: /users" });
-});
+app.use("/", revenueRouter);
 //Xử lý đăng nhập google
 passport.use(
   new GoogleStrategy(

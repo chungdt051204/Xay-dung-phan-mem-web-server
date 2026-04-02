@@ -8,11 +8,6 @@ const orderItemsSchema = new mongoose.Schema(
       required: true,
     },
 
-    // productName: {
-    //   type: String,
-    //   required: true,
-    // },
-
     quantity: {
       type: Number,
       min: 1,
@@ -93,6 +88,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
     items: [orderItemsSchema],
   },
   { timestamps: true }
