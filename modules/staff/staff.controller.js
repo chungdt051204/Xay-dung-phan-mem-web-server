@@ -5,7 +5,7 @@ exports.getStaff = async (req, res) => {
         "Mã số nhân viên": "NV100001",
         "Tên nhân viên": "Nguyễn Văn An",
         "Lương cơ bản": 500000.0,
-        "Loại nhân viên": "Văn phòng",
+        "Loại nhân viên": "Văn thư",
         "Trợ cấp": 150000.0,
       },
       {
@@ -19,7 +19,7 @@ exports.getStaff = async (req, res) => {
         "Mã số nhân viên": "NV100003",
         "Tên nhân viên": "Lê Văn Cường",
         "Lương cơ bản": 500000.0,
-        "Loại nhân viên": "Văn phòng",
+        "Loại nhân viên": "Văn thư",
         "Trợ cấp": 200000.0,
       },
       {
@@ -33,7 +33,7 @@ exports.getStaff = async (req, res) => {
         "Mã số nhân viên": "NV100005",
         "Tên nhân viên": "Hoàng Thị Hoa",
         "Lương cơ bản": 500000.0,
-        "Loại nhân viên": "Văn phòng",
+        "Loại nhân viên": "Văn thư",
         "Trợ cấp": 100000.0,
       },
       {
@@ -47,7 +47,7 @@ exports.getStaff = async (req, res) => {
         "Mã số nhân viên": "NV100007",
         "Tên nhân viên": "Đặng Văn Nam",
         "Lương cơ bản": 500000.0,
-        "Loại nhân viên": "Văn phòng",
+        "Loại nhân viên": "Văn thư",
         "Trợ cấp": 300000.0,
       },
       {
@@ -61,7 +61,7 @@ exports.getStaff = async (req, res) => {
         "Mã số nhân viên": "NV100009",
         "Tên nhân viên": "Ngô Văn Phúc",
         "Lương cơ bản": 500000.0,
-        "Loại nhân viên": "Văn phòng",
+        "Loại nhân viên": "Văn thư",
         "Trợ cấp": 180000.0,
       },
       {
