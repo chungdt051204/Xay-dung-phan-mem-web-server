@@ -24,7 +24,6 @@ const cartRouter = require("./modules/cart/cart.router");
 const orderRouter = require("./modules/order/order.router");
 const chatbotRouter = require("./modules/chatbot/chatbot.router");
 const revenueRouter = require("./modules/revenue/revenue.router");
-const staffRouter = require("./modules/staff/staff.router");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Để đọc dữ liệu từ Form
@@ -37,7 +36,6 @@ app.use("/", cartRouter);
 app.use("/", orderRouter);
 app.use("/", chatbotRouter);
 app.use("/", revenueRouter);
-app.use("/", staffRouter);
 //Xử lý đăng nhập google
 passport.use(
   new GoogleStrategy(

@@ -33,23 +33,10 @@ const productSchema = new mongoose.Schema(
       default: "",
     },
 
-    images: [
-      {
-        type: String,
-        default: "",
-      },
-    ],
-
     quantityStock: {
       //Tồn kho
       type: Number,
       required: true,
-    },
-
-    status: {
-      type: String,
-      enum: ["còn bán", "ngừng bán"],
-      default: "còn bán",
     },
 
     brandId: {
@@ -63,12 +50,6 @@ const productSchema = new mongoose.Schema(
       ref: "categoryEntity",
       required: true,
     },
-
-    colors: [
-      {
-        type : String
-      },
-    ],
   },
   {
     timestamps: true,

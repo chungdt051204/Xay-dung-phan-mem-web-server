@@ -23,7 +23,11 @@ exports.getProduct = async (req, res) => {
       return res.status(200).json({ result: product });
     }
     if (categoryId) query.categoryId = categoryId;
-    if (productName) query.productName = { $regex: productName, $options: "i" };
+    if (productName) {
+      // Escape special regex characters to ensure exact substring matching
+      const escapedProductName = productName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.productName = { $regex: escapedProductName, $options: "i" };
+    }
     const products = await productEntity.paginate(query, options);
     return res.status(200).json({ result: products });
   } catch (error) {
