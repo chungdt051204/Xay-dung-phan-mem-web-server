@@ -67,6 +67,9 @@ passport.use(
     }
   )
 );
+app.get("/", (req, res) => {
+  return res.json("Server is running...");
+});
 app.listen(port, () => {
   console.log("Server đang chạy với port:" + port);
 });
