@@ -1,127 +1,148 @@
 const cartEntity = require("../../model/cart.model");
-exports.postCart = async (req, res) => {
+const productEntity = require("../../model/product.model");
+
+//Hàm lấy giỏ hàng người dùng
+exports.getCart = async (req, res) => {
   try {
-    const { userId, productId, quantity } = req.body;
-    const myCart = await cartEntity.findOne({ userId });
-    if (!myCart) {
+    const userId = req.payload.sub;
+    const cart = await cartEntity
+      .findOne({ userId })
+      .populate("items.productId");
+
+    //Sắp xếp item theo giá tăng dần
+    if (cart && cart.items) {
+      cart.items.sort((a, b) => {
+        const priceA = a.productId ? a.productId.price : 0;
+        const priceB = b.productId ? b.productId.price : 0;
+        return priceA - priceB; // Tăng dần
+      });
+    }
+    return res.status(200).json({ result: cart });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
+  }
+};
+
+//Hàm thêm sản phẩm vào giỏ hàng
+exports.addCart = async (req, res) => {
+  try {
+    const userId = req.payload.sub;
+    const { productId, quantity } = req.body;
+    if (!productId || !quantity)
+      return res
+        .status(400)
+        .json({ message: "Vui lòng cung cấp đủ thông tin!!" });
+    const product = await productEntity.findOne({ _id: productId });
+    if (!product)
+      return res.status(404).json({ message: "Sản phẩm không tồn tại" });
+    if (quantity <= 0)
+      return res
+        .status(400)
+        .json({ message: "Số lượng sản phẩm phải lớn hơn 0" });
+    if (quantity > product?.quantityStock)
+      return res.status(400).json({ message: "Số lượng tồn kho không đủ" });
+    const cart = await cartEntity.findOne({ userId });
+    if (!cart) {
       await cartEntity.create({ userId, items: [{ productId, quantity }] });
       return res
         .status(200)
-        .json({ message: "Thêm sản phẩm vào giỏ hàng thành công" });
+        .json({ message: "Thêm sản phẩm mới vào giỏ hàng thành công" });
     } else {
-      const cartWithProduct = await cartEntity.findOne({
-        $and: [{ userId }, { "items.productId": productId }],
+      const productInCart = await cartEntity.findOne({
+        userId,
+        "items.productId": productId,
       });
-      if (!cartWithProduct) {
+      if (!productInCart) {
         await cartEntity.updateOne(
           { userId },
-          { $addToSet: { items: { productId, quantity } } }
+          {
+            $addToSet: { items: { productId, quantity } },
+          }
         );
         return res
           .status(200)
-          .json({ message: "Thêm sản phẩm vào giỏ hàng thành công" });
+          .json({ message: "Thêm sản phẩm mới vào giỏ hàng thành công" });
       } else {
         await cartEntity.updateOne(
           { userId, "items.productId": productId },
-          { $inc: { "items.$.quantity": quantity } }
+          {
+            $inc: { "items.$.quantity": quantity },
+          }
         );
         return res.status(200).json({
-          message: "Thêm số lượng sản phẩm này vào giỏ hàng thành công",
+          message: "Đã thêm số lượng sản phẩm này vào giỏ hàng thành công",
         });
       }
     }
   } catch (error) {
-    console.log({
-      message: "Có lỗi xảy ra khi xử lý hàm postCart",
-      error: error.message,
-    });
-    return res.status(500).json({
-      message: "Thêm sản phẩm vào giỏ hàng thất bại",
-      error: error.message,
-    });
-  }
-};
-exports.getCart = async (req, res) => {
-  try {
-    const payload = req.payload;
-    if (payload) {
-      const myCart = await cartEntity
-        .findOne({ userId: payload.sub })
-        .populate("items.productId");
-      return res.status(200).json({ result: myCart });
-    }
     return res
-      .status(404)
-      .json({ message: "Không tìm thấy giỏ hàng của người dùng" });
-  } catch (error) {
-    console.log({
-      message: "Có lỗi xảy ra khi xử lý hàm getCart",
-      error: error.message,
-    });
-    return res.status(500).json({
-      message: "Lấy dữ liệu giỏ hàng thất bại",
-      error: error.message,
-    });
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
   }
 };
-exports.putQuantity = async (req, res) => {
+
+//Hàm cập nhật số lượng sản phẩm
+exports.updateQuantity = async (req, res) => {
   try {
-    const { userId, action } = req.query;
-    const { itemId } = req.body;
+    const userId = req.payload.sub;
+    const { id } = req.params;
+    const { action } = req.query;
     await cartEntity.updateOne(
-      { userId, "items._id": itemId },
-      { $inc: { "items.$.quantity": action === "decrease" ? -1 : 1 } }
+      { userId, "items._id": id },
+      { $inc: { "items.$.quantity": action === "increase" ? 1 : -1 } }
     );
-    return res.status(200).json({ message: "Cập nhật số lượng thành công" });
+    return res
+      .status(200)
+      .json({ message: "Cập nhật số lượng sản phẩm thành công" });
   } catch (error) {
-    console.log({
-      message: "Có lỗi xảy ra khi xử lý hàm putQuantity",
-      error: error.message,
-    });
-    return res.status(500).json({
-      message: "Cập nhật số lượng sản phẩm thất bại",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
   }
 };
-exports.deleteItem = async (req, res) => {
+
+//Hàm xóa item ra khỏi giỏ hàng người dùng
+exports.deleteCartItem = async (req, res) => {
   try {
-    const payload = req.payload;
-    if (!payload)
-      return res
-        .status(404)
-        .json({ message: "Không tìm thấy giỏ hàng để xóa sản phẩm" });
-    const { itemId } = req.query;
-    const { itemIds } = req.body || [];
-    let option = "";
-    let message = "";
-    if (itemId) {
-      option = { items: { _id: itemId } };
-      message = "Đã xóa 1 sản phẩm ra khỏi giỏ hàng thành công";
-    }
-    if (itemIds?.length > 0) {
-      option = { items: { _id: { $in: itemIds } } };
-      message = "Đã xóa các sản phẩm được chọn ra khỏi giỏ hàng thành công";
-    }
+    const userId = req.payload.sub;
+    const { id } = req.params;
     const result = await cartEntity.updateOne(
-      { userId: payload.sub },
-      { $pull: option }
+      { userId, "items._id": id },
+      { $pull: { items: { _id: id } } }
     );
     if (result.modifiedCount === 0)
+      return res.status(404).json({ message: "Không tìm thấy item để xóa" });
+    return res.status(200).json({ message: "Xóa thành công" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
+  }
+};
+
+//Hàm xóa các item được chọn ra khỏi giỏ hàng người dùng
+exports.deleteCartItemSelected = async (req, res) => {
+  try {
+    const userId = req.payload.sub;
+    const { itemIds } = req.body;
+    if (itemIds?.length === 0)
       return res
-        .status(404)
-        .json({ message: "Không tìm thấy sản phẩm để xóa" });
+        .status(400)
+        .json({ message: "Vui lòng cung cấp đủ thông tin" });
+    const result = await cartEntity.updateOne(
+      { userId },
+      { $pull: { items: { _id: { $in: itemIds } } } }
+    );
+    if (result.modifiedCount === 0)
+      return res.status(404).json({ message: "Không tìm thấy item để xóa" });
     return res.status(200).json({
-      message: message,
+      message: `Đã xóa ${itemIds?.length} sản phẩm ra khỏi giỏ hàng thành công`,
     });
   } catch (error) {
-    console.log({
-      message: "Có lỗi xảy ra khi xử lý hàm deleteItem",
-      error: error.message,
-    });
-    return res.status(500).json({
-      message: "Xóa sản phẩm thất bại",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
   }
 };

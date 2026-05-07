@@ -2,13 +2,24 @@ const categoryEntity = require("../../model/category.model");
 const productEntity = require("../../model/product.model");
 exports.getCategory = async (req, res) => {
   try {
-    const { id } = req.query;
-    if (id) {
-      const category = await categoryEntity.findOne({ _id: id });
-      return res.status(200).json({ result: category });
-    }
     const categories = await categoryEntity.find();
     return res.status(200).json({ result: categories });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+exports.getCategoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await categoryEntity.findById(id);
+    if (!category)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy loại sản phẩm này" });
+    return res.status(200).json({ result: category });
   } catch (error) {
     return res
       .status(500)
@@ -30,7 +41,8 @@ exports.createCategory = async (req, res) => {
 
 exports.updateCategory = async (req, res) => {
   try {
-    const { id, categoryName } = req.body;
+    const { id } = req.params;
+    const { categoryName } = req.body;
     await categoryEntity.findByIdAndUpdate(id, {
       categoryName,
     });

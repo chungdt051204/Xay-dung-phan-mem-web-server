@@ -10,14 +10,21 @@ exports.getBrands = async (req, res) => {
       limit: _limit,
     };
     let query = {};
-    if (id) {
-      const brand = await brandEntity.findOne({ _id: id });
-      return res.status(200).json({ result: brand });
-    }
     const brands = await brandEntity.paginate(query, options);
     res.status(200).json({ result: brands });
   } catch (error) {
-    console.log("Lỗi ở hàm getProduct:", error);
+    console.log("Lỗi ở hàm getBrand:", error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+exports.getBrandById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const brand = await brandEntity.findById(id);
+    if (!brand) return res.status(404).json("Không tìm thấy thương hiệu này");
+    res.status(200).json({ result: brand });
+  } catch (error) {
+    console.log("Lỗi ở hàm getBrand:", error);
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
@@ -55,7 +62,8 @@ exports.createBrand = async (req, res) => {
 
 exports.updateBrand = async (req, res) => {
   try {
-    const { id, brandName } = req.body;
+    const { id } = req.params;
+    const { brandName } = req.body;
     const brand = await brandEntity.findOne({ brandName });
     if (brand)
       return res.status(409).json({ message: "Đã có thương hiệu này rồi !!!" });

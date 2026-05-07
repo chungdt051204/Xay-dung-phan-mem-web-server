@@ -7,17 +7,16 @@ const {
 } = require("../../service/middleware/authMiddleware");
 const prefix = "";
 
-// Order routes - More specific routes FIRST
-
-// General routes
 router.get("/order", orderController.getOrder);
-router.post("/order", verifyToken, orderController.postOrder);
+router.get("/order/:id", orderController.getOrderById);
+router.get("/me/order", verifyToken, orderController.getUserOrder);
+router.post("/order", verifyToken, orderController.createOrder);
 router.get(`${prefix}/momo-callback`, orderController.getMomoCallback);
-router.put("/order", orderController.updateOrderStatus);
-router.delete("/order", orderController.deleteOrder);
-router.put("/order/cancel", orderController.cancelOrder);
-
-// User specific routes
-router.get("/user/orders", orderController.getUserOrders);
-
+router.put("/order/cancel", verifyToken, orderController.cancelOrder);
+router.put(
+  "/order/:id",
+  verifyToken,
+  verifyAdmin,
+  orderController.updateOrderStatus
+);
 module.exports = router;

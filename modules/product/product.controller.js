@@ -10,7 +10,6 @@ exports.getProduct = async (req, res) => {
       _limit = arrayProducts?.length,
       categoryId,
       productName,
-      productId,
     } = req.query;
     let query = {};
     const options = {
@@ -18,14 +17,14 @@ exports.getProduct = async (req, res) => {
       limit: _limit,
       populate: ["categoryId", "brandId"],
     };
-    if (productId) {
-      const product = await productEntity.findOne({ _id: productId });
-      return res.status(200).json({ result: product });
-    }
+
     if (categoryId) query.categoryId = categoryId;
     if (productName) {
       // Escape special regex characters to ensure exact substring matching
-      const escapedProductName = productName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const escapedProductName = productName.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
       query.productName = { $regex: escapedProductName, $options: "i" };
     }
     const products = await productEntity.paginate(query, options);
@@ -36,6 +35,18 @@ exports.getProduct = async (req, res) => {
       error: error.message,
     });
     return res.status(500).json({ message: "Lấy dữ liệu sản phẩm thất bại" });
+  }
+};
+
+exports.getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productEntity.findById(id);
+    if (!product)
+      return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    return res.status(200).json({ result: product });
+  } catch (error) {
+    return res.status(500).json({ message: "Lấy thông tin sản phẩm thất bại" });
   }
 };
 
@@ -82,8 +93,8 @@ exports.createProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
+    const { id } = req.params;
     const {
-      id,
       productName,
       price,
       techSpecs,

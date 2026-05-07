@@ -3,10 +3,10 @@ const revenueEntity = require("../../model/revenue.model");
 exports.getRevenueTrend = async (req, res) => {
   try {
     const startOf7DayAgo = dayjs().subtract(7, "day").toDate();
-    const endOfToday = dayjs().endOf("week").toDate();
+    const endOfToday = dayjs().endOf("day").toDate();
     const revenue = await revenueEntity.aggregate([
       {
-        $match: { createdAt: { $gt: startOf7DayAgo, $lt: endOfToday } },
+        $match: { createdAt: { $gte: startOf7DayAgo, $lte: endOfToday } },
       },
       {
         $group: {
@@ -22,26 +22,30 @@ exports.getRevenueTrend = async (req, res) => {
     ]);
     return res.status(200).json({ result: revenue });
   } catch (error) {
-    console.log({ error: error });
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
   }
 };
 exports.getDailyCategoryStats = async (req, res) => {
   try {
-    const start = dayjs().startOf("day").toDate();
-    const end = dayjs().endOf("day").toDate();
-    const revenue = await revenueEntity.aggregate([
+    const startOfToday = dayjs().startOf("day").toDate();
+    const endOfToday = dayjs().endOf("day").toDate();
+    const categoryStats = await revenueEntity.aggregate([
       {
-        $match: { createdAt: { $gt: start, $lt: end } },
+        $match: { createdAt: { $gte: startOfToday, $lte: endOfToday } },
       },
       {
         $lookup: {
-          from: "product", // Tên collection
-          localField: "productId", // Khóa ngoại ở bảng revenue
-          foreignField: "_id", // Khóa chính ở bảng product
-          as: "productInfo", // Tên biến tạm chứa thông tin sp
+          from: "product",
+          localField: "productId",
+          foreignField: "_id",
+          as: "productInfo",
         },
       },
-      { $unwind: "$productInfo" }, // Trải phẳng mảng productInfo
+      {
+        $unwind: "$productInfo",
+      },
       {
         $group: {
           _id: "$productInfo.categoryId",
@@ -50,12 +54,16 @@ exports.getDailyCategoryStats = async (req, res) => {
       },
       {
         $sort: {
-          _id: 1,
+          totalRevenue: -1,
         },
       },
     ]);
-    return res.status(200).json({ result: revenue });
-  } catch (error) {}
+    return res.status(200).json({ result: categoryStats });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
+  }
 };
 exports.getBestSeller = async (req, res) => {
   try {
@@ -67,6 +75,9 @@ exports.getBestSeller = async (req, res) => {
           foreignField: "_id",
           as: "productInfo",
         },
+      },
+      {
+        $unwind: "$productInfo",
       },
       {
         $group: {
@@ -85,6 +96,8 @@ exports.getBestSeller = async (req, res) => {
     ]);
     return res.status(200).json({ result: bestSeller });
   } catch (error) {
-    console.log({ error: error });
+    return res
+      .status(500)
+      .json({ message: "Lỗi hệ thống", error: error.message });
   }
 };
